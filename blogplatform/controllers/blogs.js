@@ -36,7 +36,7 @@ blogsRouter.post('/', async (request, response) => {
     blog.user = user
 
     const savedBlog = await blog.save()
-
+    console.log(savedBlog, 'savedblog')
     //pitää lisätä myös userin notesiin
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
@@ -57,7 +57,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     console.log(blog, 'bloggg')
 
     if (blog.user.toString() !== user.id.toString()) {
-        return response.status(401).json({ error: 'you need to be signed in as the creator to delete blog' })
+        return response.status(401).json({ error: 'you need to be signed in as the creator to delete this blog' })
     }
 
     await blog.remove()
@@ -69,11 +69,22 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
     const blog = request.body
-    console.log(blog)
+    console.log(request.params.id, 'id')
+    console.log(blog, 'blog')
 
-    const mongoresponse = await Blog.findByIdAndUpdate(request.params.id, blog)
-    console.log(mongoresponse)
-    response.end()
+
+    
+    const filter = { _id: blog.id }
+    const update = { likes: blog.likes }
+
+    const mongoresponse = await Blog.findOneAndUpdate(filter, update, { new: true })
+
+    // THIS DID NOT WORK FOR SOME REASON
+    // const mongoresponse = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true }).catch(e => console.log(e, 'mongoose'))
+
+
+    console.log(mongoresponse, 'mongo res')
+    response.json(mongoresponse.toJSON())
 })
 
 module.exports = blogsRouter
