@@ -73,7 +73,7 @@ blogsRouter.put('/:id', async (request, response) => {
     console.log(blog, 'blog')
 
 
-    
+
     const filter = { _id: blog.id }
     const update = { likes: blog.likes }
 
